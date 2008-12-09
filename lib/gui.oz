@@ -56,16 +56,16 @@ define
 		{GoToPage}
 	end
 	proc {PageChange} %when the user changes the page
-		CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
-		%skip
+		%CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
+		skip
 	end
 	proc {Refresh} %when the user refresh the page
 		{GoToPage}
 	end
-	/*proc {Save} %when the user saves the page
+	proc {Save} %when the user saves the page
 		{System.show save}
-		%CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
-	end*/
+		CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
+	end
 	
 D=td(	return:GuiQuit
 	lr( 	
@@ -95,10 +95,10 @@ D=td(	return:GuiQuit
 		action:PageChange)
 	lr(	
 		glue:swe
-		/*button(
+		button(
 			text:"Save changes"
 			glue:swe
-			action:Save)*/
+			action:Save)
 		button(
 			text:"Refresh page"
 			glue:swe
