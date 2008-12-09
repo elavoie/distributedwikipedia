@@ -2,41 +2,70 @@ functor
 import
 	Pickle
 	Connection
-	P2PS
+	P2PS at 'p2ps/trunk/P2PSNode.ozf'
 	System
 	QTk at 'x-oz://system/wp/QTk.ozf'
-	Transaction
 	Application
+	Page at 'Page.ozf' 
+	RingInit at 'RingInit.ozf'
+	Transactions at 'Transactions.ozf'
 define
 	Win		% the window
 	DefaultTicketFile = "default_connection.ticket"
 	OzTicket = {NewCell nil} % ticket to the server
 	RingRef		%reference to the server
 	Node		%the client node
-	UrlHandle
-	Url	= {NewCell nil} %the url
+	UrlHandle	
 	PageHandle
 	GuiQuit		%binds when the application quits
+	CurrentPage = {NewCell {Page.newpage}}	%the current symbolic page
+	proc {Offer T FN}
+   		{Pickle.save {Connection.offerMany T} FN}
+	end
+	proc {SetPageText}
+		{PageHandle set( {Page.tostring @CurrentPage} )}
+	end
+	fun {GetPageText}
+		{PageHandle get($)}
+	end
+	fun {GetUrl}
+		{String.toAtom {UrlHandle get($)}}
+	end
 	proc {ServerConnect}	%when the user clicks on connect
+		{System.show serverconnect_start}
 		OzTicket := {String.toAtom{UrlHandle get($)}}
-		RingRef = {Connection.take @OzTicket}
 		{System.show @OzTicket}
+		%RingRef = {Connection.take @OzTicket}
+
+		Node = {P2PS.newP2PSNode args(dist:dss transactions:true)}
+		{Node join(RingRef)}
+		{System.show {Node getId($)}#{Node getSuccRef($)}}
+		CurrentPage := {Transactions.refresh Node home}
+		{UrlHandle set( {Atom.toString home} )}
+		{SetPageText}
+		{System.show serverconnect_end}
 	end
 	proc {GoToPage}	%when the user clicks on go to page
-		{System.show goToPage}
+		CurrentPage := {Transactions.refresh Node {GetUrl} }
+		{SetPageText}
 	end
 	proc {Submit} %when the user clicks on submit
-		{System.show submit}
+		Result = {Transactions.submit Node {GetUrl} @CurrentPage}
+		%TODO (renvoie true ou false ) Popup si ca marche pas.
+		in
+		{GoToPage}
 	end
 	proc {PageChange} %when the user changes the page
-		{System.show pageChanged} 
+		CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
+		%skip
 	end
 	proc {Refresh} %when the user refresh the page
-		{System.show refresh}
+		{GoToPage}
 	end
-	proc {Save} %when the user saves the page
+	/*proc {Save} %when the user saves the page
 		{System.show save}
-	end
+		%CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
+	end*/
 	
 D=td(	return:GuiQuit
 	lr( 	
@@ -66,10 +95,10 @@ D=td(	return:GuiQuit
 		action:PageChange)
 	lr(	
 		glue:swe
-		button(
+		/*button(
 			text:"Save changes"
 			glue:swe
-			action:Save)
+			action:Save)*/
 		button(
 			text:"Refresh page"
 			glue:swe
@@ -85,7 +114,10 @@ D=td(	return:GuiQuit
 			
 	)
 )
-in
+in	
+	
+	%{Offer {RingInit.newring dss} DefaultTicketFile} 
+	RingRef = {RingInit.newring dss}
 	Win = {QTk.build D}
 	{Win show}
 	{Wait GuiQuit}
