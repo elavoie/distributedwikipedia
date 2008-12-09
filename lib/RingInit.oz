@@ -1,9 +1,5 @@
 functor
 import
-   %System
-   %QTk at 'x-oz://system/wp/QTk.ozf'
-   %Application
-   %Connection
    P2PS at 'p2ps/trunk/P2PSNode.ozf'
 export
    newring:NewRing
@@ -21,20 +17,4 @@ define
       {N4 join(RingRef)}
       {N5 join(RingRef)}
    end
-%    RingRef R
-%    Desc=message(aspect:200
-% 		init:"The ring is running"
-% 		handle:_
-% 		return:R
-% 	       )
-
-  %  RingRef={NewRing dss}
-%    % UI to show that the ring is initialized
-
-%    {{QTk.build td(Desc)} show}
-%     % Output on the command line the reference to the ring
-%    {System.show {Connection.offerMany RingRef}}
-   
-%    {Wait R} % R will be binded when the window is closed
-%    {Application.exit 0}
 end
