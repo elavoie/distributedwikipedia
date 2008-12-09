@@ -31,16 +31,22 @@ define
 	fun {GetUrl}
 		{String.toAtom {UrlHandle get($)}}
 	end
+	proc {SetUrl S}
+		{UrlHandle set(S)}
+	end
 	proc {ServerConnect}	%when the user clicks on connect
 		{System.show serverconnect_start}
-		OzTicket := {String.toAtom{UrlHandle get($)}}
-		{System.show @OzTicket}
-		%RingRef = {Connection.take @OzTicket}
-
+		OzTicket := {String.toAtom {UrlHandle get($)}}
+		{System.show gotOzTicket}
+		RingRef = {Connection.take @OzTicket}
+		{System.show gotRingRef}
 		Node = {P2PS.newP2PSNode args(dist:dss transactions:true)}
+		{System.show gotNode}
 		{Node join(RingRef)}
+		{System.show nodeJoined}
 		{System.show {Node getId($)}#{Node getSuccRef($)}}
 		CurrentPage := {Transactions.refresh Node home}
+		{System.show pageRefreshed}
 		{UrlHandle set( {Atom.toString home} )}
 		{SetPageText}
 		{System.show serverconnect_end}
@@ -73,7 +79,6 @@ D=td(	return:GuiQuit
 		entry(
 			handle:UrlHandle
 			glue:we
-			init:{Pickle.load DefaultTicketFile} 
 			)
 		button(	
 			text:"Go to page" 
@@ -117,9 +122,13 @@ D=td(	return:GuiQuit
 in	
 	
 	%{Offer {RingInit.newring dss} DefaultTicketFile} 
-	RingRef = {RingInit.newring dss}
+	
+	%{Pickle.save {Connection.offerMany {RingInit.newring dss}} DefaultTicketFile}
+	
+	%RingRef = {RingInit.newring dss}
 	Win = {QTk.build D}
 	{Win show}
+	{SetUrl {Pickle.load DefaultTicketFile}}
 	{Wait GuiQuit}
 	{Application.exit 0}
 end
