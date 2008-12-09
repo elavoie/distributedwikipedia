@@ -6,17 +6,23 @@ import
    Connection
    P2PS at 'p2ps/trunk/P2PSNode.ozf'
 export
+   newring:NewRing
 define
-   N1={P2PS.newP2PSNode args(dist:dss transactions:true)}
-   N2={P2PS.newP2PSNode args(dist:dss transactions:true)}
-   N3={P2PS.newP2PSNode args(dist:dss transactions:true)}
-   N4={P2PS.newP2PSNode args(dist:dss transactions:true)}
-   N5={P2PS.newP2PSNode args(dist:dss transactions:true)}
-   RingRef={N1 getRingRef($)}
-   {N2 join(RingRef)}
-   {N3 join(RingRef)}
-   {N4 join(RingRef)}
-   {N5 join(RingRef)}
+   fun {NewRing Type}
+      N1={P2PS.newP2PSNode args(dist:Type transactions:true)}
+      N2={P2PS.newP2PSNode args(dist:Type transactions:true)}
+      N3={P2PS.newP2PSNode args(dist:Type transactions:true)}
+      N4={P2PS.newP2PSNode args(dist:Type transactions:true)}
+      N5={P2PS.newP2PSNode args(dist:Type transactions:true)}
+      {N2 join(RingRef)}
+      {N3 join(RingRef)}
+      {N4 join(RingRef)}
+      {N5 join(RingRef)}
+      {N1 getRingRef($)}
+   end
+   RingRef
+in
+   RingRef={NewRing dss}
    % UI to show that the ring is initialized
    R
    Desc=message(aspect:200
