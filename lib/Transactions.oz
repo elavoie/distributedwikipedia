@@ -1,6 +1,6 @@
 functor
 import
-   Page at 'bin/Page.ozf'
+   Page at 'Page.ozf'
 export
    submit:Submit
    refresh:Refresh
@@ -11,7 +11,14 @@ define
    in
       Transaction =
       proc {$ TM}
-	 OldPage in
+	 OldPage Temp in
+	 {TM read(Url Temp)}
+	 if {Value.status Temp} == failed then
+	    OldPage={Page.newpage}
+	    {TM write(Url OldPage)}
+	 else
+	    OldPage=Temp
+	 end
 	 {TM read(Url OldPage)}
 	 MergedPage={Page.merge OldPage NewPage}
 	 {TM write(Url MergedPage)}
@@ -24,8 +31,15 @@ define
    end
    proc {MakeRefresh Url ?CurrentPage ?Transaction}
       Transaction =
-      proc {$ TM}
-	 {TM read(Url CurrentPage)}
+      proc {$ TM} Temp in
+	 {TM read(Url Temp)}
+	 if {Value.status Temp} == failed then
+	    CurrentPage={Page.newpage}
+	    {TM write(Url CurrentPage)}
+	 else
+	    CurrentPage=Temp
+	 end
+	 {TM commit}
       end
    end
    proc {Submit Node Url NewPage ?Success}
