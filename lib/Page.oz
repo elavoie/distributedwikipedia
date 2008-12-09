@@ -173,13 +173,13 @@ define
       String={NewCell ""}
    in
       for P in 1..Page.highestposition do Par=Page.content.(Page.P) in
-	 String:={Append {Append @String Par.content} "\n"}
+	 String:={Append {Append @String Par.content} "\n\n"}
       end
       @String
    end
 % Update page from string modification
    fun {UpdateFromString Page NewString}
-      Pars={String.tokens NewString &\n}
+      Pars={List.filter {String.tokens NewString &\n} fun {$ X} X \= nil end}
       NewPage={NewCell Page}
    in
    % Only updates have occured
