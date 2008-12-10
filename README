@@ -1,2 +1,23 @@
-test
+WikiOz - Wiki Distribué
+=======================
+
+Installation :
+--------------
+$ make 
+
+Lancement :
+--------------
+$ ozengine bin/gui.ozf
+
+Les clients doivent être lancés dans le même répertoire, si l'on ne veut
+pas devoir copier coller manuellement le Ticket vers le premier client.
+
+Bugs :
+------
+Parfois un client segfault.
+Parfois un client freeze. 
+Dans ces cas il vaut mieux relancer tous les clients.
+
+
+
 

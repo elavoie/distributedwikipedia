@@ -1,3 +1,4 @@
+%The Logical page representation
 functor
 import
 export
