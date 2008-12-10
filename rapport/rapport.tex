@@ -61,6 +61,30 @@
 	effectués et sauvegardés il peut les envoyer sur le réseau. En cas
 	de conflit dans un paragraphe, les changements ne sont pas effectués,
 	l'utilisateur est notifié, et la page est rafraichie à sa version la plus
-	récente 
+	récente. 
+	
+	\section{Validation des requis}
+	Les deux tests présentés ci-après montrent la gestion des différentes modifications,
+	lors d'un conflit et lors d'une modification concurrente réussie.
+	
+	\subsection{Gestion d'un conflit d'édition}
+	Le plus simple cas pour réaliser un conflit d'édition est de suivre les étapes suivantes:
+	\begin{itemize}
+		\item Démarrer un premier client
+		\item Démarrer l'anneau de noeuds ''server'' sur un des deux clients.
+		\item Démarrer un deuxième client et se connecter au premier.  Par défaut, le ticket
+			du premier sera déjà dans la barre d'adresse.
+		\item Sur le premier client, modifier la ligne de texte, sauvegarder et soumettre les
+			changements.
+		\item 	
+	\end{itemize}
+	
+	\subsection{Gestion de modifications concurrentes indépendantes}
+	
+	\section{Architecture}
+	
+	\section{Design}
+	
+	\subsection{Limitations}
 	 
 \end{document}
