@@ -15,9 +15,17 @@ define
 	OzTicket = {NewCell nil} % ticket to the server
 	RingRef		%reference to the server
 	Node		%the client node
-	UrlHandle	
+	
+	UrlHandle	%widget handles
 	PageHandle
 	StatusHandle
+	HostButtonHandle
+	GoButtonHandle
+	ConnectButtonHandle
+	SaveButtonHandle
+	SubmitButtonHandle
+	RefreshButtonHandle
+	
 	GuiQuit		%binds when the application quits
 	CurrentPage = {NewCell {Page.newpage}}	%the current symbolic page
 	proc {Offer T FN}
@@ -34,6 +42,13 @@ define
 	end
 	proc {SetUrl S}
 		{UrlHandle set(S)}
+	end
+	proc {SetButtonConnected}
+		{PageHandle set(state:normal)}
+		{HostButtonHandle set(state:disabled)}
+		{GoButtonHandle set(state:normal)}
+		{ConnectButtonHandle set(state:disabled)}
+		{RefreshButtonHandle set(state:normal)}
 	end
 	proc {SetStatusOnline}
 		{StatusHandle set("Online")}
@@ -55,6 +70,10 @@ define
 		{StatusHandle set("Changes have been submitted")}
 		{StatusHandle set(bg:c(0 255 128))}
 	end
+	proc {SetStatusNewServer}
+		{StatusHandle set(@OzTicket)}
+		{StatusHandle set(bg:c(0 128 255))}
+	end
 	proc {ServerConnect}	%when the user clicks on connect
 		{System.show serverconnect_start}
 		OzTicket := {String.toAtom {UrlHandle get($)}}
@@ -71,7 +90,24 @@ define
 		{UrlHandle set( {Atom.toString home} )}
 		{SetPageText}
 		{SetStatusOnline}
+		{SetButtonConnected}
 		{System.show serverconnect_end}
+	end
+	proc {ServerHost}	%when the user clicks on server host
+		{System.show serverhost_start}
+		RingRef = {RingInit.newring dss}
+		OzTicket := {Connection.offerMany RingRef}
+		{Pickle.save @OzTicket DefaultTicketFile}
+		{SetUrl @OzTicket}
+		%	server created.
+		Node = {P2PS.newP2PSNode args(dist:dss transactions:true)}
+		{Node join(RingRef)}
+		CurrentPage := {Transactions.refresh Node home}
+		{System.show pageRefreshed}
+		{UrlHandle set({Atom.toString home} )}
+		{SetPageText}
+		{SetStatusNewServer}
+		{SetButtonConnected}
 	end
 	proc {GoToPage}	%when the user clicks on go to page
 		CurrentPage := {Transactions.refresh Node {GetUrl} }
@@ -88,19 +124,26 @@ define
 		else 
 			{SetStatusComitError}
 		end
+		{SubmitButtonHandle set(state:disabled)}
 	end
 	proc {PageChange} %when the user changes the page
 		%CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
 		{SetStatusUnsaved}
+		{SaveButtonHandle set(state:normal)}
+		{SubmitButtonHandle set(state:disabled)}
 		skip
 	end
 	proc {Refresh} %when the user refresh the page
 		{GoToPage}
+		{SaveButtonHandle set(state:disabled)}
+		{SubmitButtonHandle set(state:disabled)}
 	end
 	proc {Save} %when the user saves the page
 		{System.show save}
 		CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
 		{SetStatusComit}
+		{SaveButtonHandle set(state:disabled)}
+		{SubmitButtonHandle set(state:normal)}
 	end
 	
 D=td(	return:GuiQuit
@@ -111,15 +154,22 @@ D=td(	return:GuiQuit
 			glue:we
 			)
 		button(	
+			handle:GoButtonHandle
 			text:"Go to page" 
 			glue:ne		
 			action: GoToPage
-			
+			state:disabled
 			)
 		button(
+			handle:ConnectButtonHandle
 			text:"Connect to server"
 			glue:ne
 			action:ServerConnect)
+		button(
+			handle:HostButtonHandle
+			text:"Host server"
+			glue:ne
+			action:ServerHost)
 		
 	)
 	text(	
@@ -127,21 +177,28 @@ D=td(	return:GuiQuit
 		glue:nswe
 		tdscrollbar:true
 		bg:white
-		action:PageChange)
+		action:PageChange
+		state:disabled)
 	lr(	
 		glue:swe
 		button(
+			handle:SaveButtonHandle
 			text:"Save changes"
 			glue:swe
-			action:Save)
+			action:Save
+			state:disabled)
 		button(
+			handle:RefreshButtonHandle
 			text:"Refresh page"
 			glue:swe
-			action:Refresh)
+			action:Refresh
+			state:disabled)
 		button(
+			handle:SubmitButtonHandle
 			text:"Submit saved changes"
 			glue:swe
-			action:Submit)
+			action:Submit
+			state:disabled)
 		button(
 			text:"Exit"
 			glue:swe
