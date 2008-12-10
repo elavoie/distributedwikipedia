@@ -87,10 +87,10 @@ define
 		{System.show {Node getId($)}#{Node getSuccRef($)}}
 		CurrentPage := {Transactions.refresh Node home}
 		{System.show pageRefreshed}
+		{SetButtonConnected}
 		{UrlHandle set( {Atom.toString home} )}
 		{SetPageText}
 		{SetStatusOnline}
-		{SetButtonConnected}
 		{System.show serverconnect_end}
 	end
 	proc {ServerHost}	%when the user clicks on server host
@@ -102,12 +102,13 @@ define
 		%	server created.
 		Node = {P2PS.newP2PSNode args(dist:dss transactions:true)}
 		{Node join(RingRef)}
+		{SetButtonConnected}	%Must be before we refresh the page
 		CurrentPage := {Transactions.refresh Node home}
 		{System.show pageRefreshed}
 		{UrlHandle set({Atom.toString home} )}
 		{SetPageText}
 		{SetStatusNewServer}
-		{SetButtonConnected}
+
 	end
 	proc {GoToPage}	%when the user clicks on go to page
 		CurrentPage := {Transactions.refresh Node {GetUrl} }
