@@ -86,5 +86,36 @@
 	\section{Design}
 	
 	\subsection{Limitations}
-	 
+	Notre application actuelle est sympathique en tant que proof-of-concept,
+	mais souffre d'un certain nombre de limitations.
+	\subsubsection{Connectivité} 
+		Pour l'instant, pour se connecter, l'utilisateur doit posséder
+		un ticket oz vers le processus ayant instancié le réseau.
+		Si jamais ce processus n'existe plus il sera impossible pour de
+		nouveaux clients de se connecter au réseau. 
+		
+		Pour résoudre ce problème il faudrait que chaque client puisse
+		générer un ticket à partir duquel l'on puisse se connecter.
+		
+	 \subsubsection{Modifications Concurrentes}
+	 	Si l'algorithme de merge du format symbolique des pages est
+	 	assez intelligent, l'algorithme qui génère ce format symbolique
+	 	ne l'est pas suffisemment. 
+	 	
+	 	Les conséquences sont qu'il faut enregistrer localement à 
+	 	chaque modification de facon manuelle, qu'il ne peut y avoir qu'une modification par
+	 	paragraphe, et qu'on ne peut supprimer qu'un seul paragraphe par
+	 	transaction. 
+	 	
+	 	Pour résoudre ces problèmes, il faudrait garder une copie de
+	 	la version originale aux cotés de la version modifiée par l'utilisateur.
+	 	Cela permettrait de ne pas devoir augmenter les numéros de versions
+	 	de paragraphe à chaque modification, et la sauvegarde locale peut
+	 	se faire automatiquement, ce qui rendrait l'utilisation de notre
+	 	programme plus conviviale. 
+	 	
+	 	Un autre souci est la gestion des conflits de transaction.
+	 	Pour l'instant les changements sont annulés. Il serait plus
+	 	intéressant de renvoyer une version contenant les conflits à résoudre
+	 	comme le font les Systêmes de contrôle de versions.
 \end{document}
