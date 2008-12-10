@@ -66,6 +66,10 @@ define
 		{StatusHandle set("Could not submit, changes lost")}
 		{StatusHandle set(bg:c(255 0 0 ))}
 	end
+	proc {SetStatusSaveError}
+		{StatusHandle set("Could not understand text changes. Reverting")}
+		{StatusHandle set(bg:c(255 0 0 ))}
+	end
 	proc {SetStatusComitSuccess}
 		{StatusHandle set("Changes have been submitted")}
 		{StatusHandle set(bg:c(0 255 128))}
@@ -92,7 +96,7 @@ define
 		{SetPageText}
 		{SetStatusOnline}
 		{System.show serverconnect_end}
-	end
+	end		
 	proc {ServerHost}	%when the user clicks on server host
 		{System.show serverhost_start}
 		RingRef = {RingInit.newring dss}
@@ -142,9 +146,15 @@ define
 	proc {Save} %when the user saves the page
 		{System.show save}
 		CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
-		{SetStatusComit}
-		{SaveButtonHandle set(state:disabled)}
-		{SubmitButtonHandle set(state:normal)}
+		if @CurrentPage == nil then
+			{System.show saveError}
+			{Refresh}
+			{SetStatusSaveError}
+		else
+			{SetStatusComit}
+			{SaveButtonHandle set(state:disabled)}
+			{SubmitButtonHandle set(state:normal)}
+		end
 	end
 	
 D=td(	return:GuiQuit
