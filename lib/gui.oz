@@ -96,7 +96,7 @@ define
 		{SetPageText}
 		{SetStatusOnline}
 		{System.show serverconnect_end}
-	end
+	end		
 	proc {ServerHost}	%when the user clicks on server host
 		{System.show serverhost_start}
 		RingRef = {RingInit.newring dss}
@@ -146,7 +146,8 @@ define
 	proc {Save} %when the user saves the page
 		{System.show save}
 		CurrentPage := {Page.updatefromstring @CurrentPage {GetPageText}}
-		if CurrentPage == nil then
+		if @CurrentPage == nil then
+			{System.show saveError}
 			{Refresh}
 			{SetStatusSaveError}
 		else

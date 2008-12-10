@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+\title{ Wiki Distribué } 
+\author{ Erick Lavoie \\ Frédéric van der Essen}
+
+
+
+\begin{document}
+	\maketitle
+	\section{Mode d'emploi} 
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.5]{connection.png}
+		\caption{L'application en phase de connection}
+	\end{figure}
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.5]{connected.png}
+		\caption{L'application en phase de navigation}
+	\end{figure}
+	
+	\subsection{Se connecter au réseau}
+	La première étape lorsque l'on ouvre le programme est de se connecter
+	à un réseau pair à pair. Notre implémentation permet à l'utilisateur de
+	choisir deux options. 
+	
+	\emph{Host Server} initialise un nouveau réseau
+	pair à pair avec un nombre suffisants de noeuds pour que celui ci puisse
+	fonctionner correctement. Ensuite, l'application s'y connecte et renvoie
+	à l'utilisateur un ticket oz pour que d'autres applications puissent s'y
+	connecter. Dans ce cas l'ensemble du réseau pair à pair tourne dans
+	un seul processus.
+	
+	\emph{Connect to Server} se connecte à un réseau pair à pair existant.
+	Pour ce faire, l'utilisateur doit disposer d'un ticket oz. Si un serveur
+	tourne déjà sous le même utilisateur Unix, alors l'application ira
+	automatiquement chercher le ticket dans un fichier se trouvant dans
+	le répertoire utilisateur. Sinon, l'utilisateur devra trouver son ticket
+	oz par mail ou sur un site web. 
+	
+	Une fois connecté, l'utilisateur peut en appellant \emph{Host Server}
+	récupérer un ticket oz vers son client pour que d'autres utilisateurs
+	puissent se connecter au réseau via sa machine. 
+	
+	\subsection{Navigation des pages web}
+	Une fois connecté à un réseau, l'utilisateur entre sur la page par défaut
+	\emph{home}. L'utilisateur peut se rendre sur n'importe quelle page en
+	entrant son url dans la barre du haut. Si cette page n'existe pas, 
+	une nouvelle sera automatiquement créée. l'url n'a pas de format spécifique
+	et peut être n'importe quelle string. 
+	
+	L'utilisateur peut aussi rafraichir une page ce qui lui permet d'accéder
+	à la dernière version.
+	
+	\subsection{Édition des pages web}
+	Lorsque l'utilisateur est sur une page, il peut la modifier à loisir.
+	Pour cela il suffit de l'editer. Après chaque changement dans un paragraphe,
+	l'utilisateur doit les sauvegarder. Une fois tous ses changements
+	effectués et sauvegardés il peut les envoyer sur le réseau. En cas
+	de conflit dans un paragraphe, les changements ne sont pas effectués,
+	l'utilisateur est notifié, et la page est rafraichie à sa version la plus
+	récente 
+	 
+\end{document}
