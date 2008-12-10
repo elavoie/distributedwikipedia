@@ -27,10 +27,10 @@
 	choisir deux options. 
 	
 	\emph{Host Server} initialise un nouveau réseau
-	pair à pair avec un nombre suffisants de noeuds pour que celui ci puisse
+	pair à pair avec un nombre suffisants de noeuds pour que celui-ci puisse
 	fonctionner correctement. Ensuite, l'application s'y connecte et renvoie
 	à l'utilisateur un ticket oz pour que d'autres applications puissent s'y
-	connecter. Dans ce cas l'ensemble du réseau pair à pair tourne dans
+	connecter. Dans ce cas, l'ensemble du réseau pair à pair tourne dans
 	un seul processus.
 	
 	\emph{Connect to Server} se connecte à un réseau pair à pair existant.
@@ -39,10 +39,6 @@
 	automatiquement chercher le ticket dans un fichier se trouvant dans
 	le répertoire utilisateur. Sinon, l'utilisateur devra trouver son ticket
 	oz par mail ou sur un site web. 
-	
-	Une fois connecté, l'utilisateur peut en appellant \emph{Host Server}
-	récupérer un ticket oz vers son client pour que d'autres utilisateurs
-	puissent se connecter au réseau via sa machine. 
 	
 	\subsection{Navigation des pages web}
 	Une fois connecté à un réseau, l'utilisateur entre sur la page par défaut
@@ -56,12 +52,14 @@
 	
 	\subsection{Édition des pages web}
 	Lorsque l'utilisateur est sur une page, il peut la modifier à loisir.
-	Pour cela il suffit de l'editer. Après chaque changement dans un paragraphe,
+	Pour cela il suffit de l'éditer. Après chaque changement dans un paragraphe,
 	l'utilisateur doit les sauvegarder. Une fois tous ses changements
 	effectués et sauvegardés il peut les envoyer sur le réseau. En cas
 	de conflit dans un paragraphe, les changements ne sont pas effectués,
 	l'utilisateur est notifié, et la page est rafraichie à sa version la plus
-	récente. 
+	récente.  Actuellement, il n'est possible d'ajouter ou de supprimer
+	qu'un seul paragraphe par sauvegarde.  Cependant, il est possible de
+	soumettre le résultat de plus d'une sauvegarde sur le réseau.
 	
 	\section{Validation des requis}
 	Les deux tests présentés ci-après montrent la gestion des différentes modifications,
@@ -77,7 +75,7 @@
 		\item Sur le premier client, modifier la ligne de texte, sauvegarder et soumettre les
 			changements.
 		\item Sur le deuxième, modifier également le texte, sauvegarder et soumettre le texte. 
-			Le client notifiera que la modification ne peut être effectuée et chargera la dernière
+			Le deuxième client notifiera que la modification ne peut être effectuée et chargera la dernière
 			page valide sur le serveur.	
 	\end{itemize}
 	
@@ -104,16 +102,12 @@
 	problèmes de connexion rencontrés, nous nous en sommes tenus à la version simple de l'anneau, 
 	sans utiliser la possibilité de ''relaxer'' l'anneau avec des branches.  Pour assurer la majorité lors des
 	différentes opérations distribuées, nécessaire pour réaliser les ''commit'' avec l'algorithme Paxos,
-	un anneau initial composé de 5 noeuds est initialisé lors que la fonction ''host server'' est utilisée.
+	un anneau initial composé de 5 noeuds est initialisé lorsque la fonction ''host server'' est utilisée.
 	L'anneau tourne alors dans le même processus Oz que le client.  Tous les clients suivants qui
 	se connectent auront un noeud dans leur processus qui se connectera au processus initial.  Cette topologie
 	a été utlisée pour la simple et unique raison qu'elle minimisait les risques d'erreurs de connexion au moment 
 	où un noeud dans un autre processus se joint à l'anneau, puisque plusieurs erreurs ont été 
 	rencontrées au courant du développement.
-	
-	Pour la version finale, nous nous attendions à utiliser un noeud par processus Oz, donc par client et démarrer
-	un ensemble de noeuds pour simuler un grand nombre de clients déjà connectés entre eux.  L'objectif final
-	serait que même si un client se déconnecte, l'anneau survit et reste intègre.
 	
 	
 	\section{Design}
@@ -149,11 +143,28 @@
 	il a été choisi de demander à l'utilisateur de sauvegarder en version symbolique manuellement la version qu'il est 
 	en train d'éditer.  Il est possible de procéder à plusieurs sauvegardes avant de fusionner avec la version courante
 	car l'algorithme de fusion est assez robuste.
+
+	\newpage	
+	Voici la page par défaut affichée ainsi que l'explication des différents champs de la page.
+
+	\begin{verbatim}
+	page(1:1  // Position dans la page:ID du paragraphe
+	           content:content(
+	                             1:paragraph(content:''To be filled.'' 
+	                                                      version:1) 
+	                              count:1)  // Nb de paragraphes,
+	                               	        // pour generer des ID uniques
+	           highestposition:1 // Nb de paragraphe dans la page
+	           version:1) 
+	\end{verbatim}	
+	
+	Les pages et les opérations associées sont dans le functor Page.oz sous lib/ dans le code source.
 	
 	
 	\subsection{Limitations et Améliorations potentielles}
-	Notre application actuelle est sympathique en tant que proof-of-concept,
-	mais souffre d'un certain nombre de limitations.
+	Notre application actuelle remplie les exigences telle que présentées dans le document de requis
+	mais ces exigences semblent clairement insuffisantes pour une utilisation réelle.  Voici donc une
+	explication des limitations rencontrées qui devraient être surpassées.
 	\subsubsection{Connectivité} 
 		Pour l'instant, pour se connecter, l'utilisateur doit posséder
 		un ticket oz vers le processus ayant instancié le réseau.
@@ -184,4 +195,19 @@
 	 	Pour l'instant les changements sont annulés. Il serait plus
 	 	intéressant de renvoyer une version contenant les conflits à résoudre
 	 	comme le font les Systêmes de contrôle de versions.
+		
+	\section{Bugs rencontrés}
+	Nous n'avons pas eu le temps d'établir une procédure de reproduction pour les deux bugs
+	rencontrés ce qui limite l'utilité de la présente section.  Cependant, ceux-ci sont quand même 
+	présentés pour que vous puissiez sonder rapidement le bugs rencontrés par chacune des équipes.
+	
+	Le premier bug est une faute de segmentation rencontrée typiquement lors de la connexion de 
+	deux processus oz lors de la prise d'un ticket.  Nous rencontrons ce bug lors du démarrage
+	de l'application.  Cependant, à partir du moment où la connexion est établie nous n'avons pas 
+	rencontré de faute de segmentation.  Il est suspecté que ce soit un bug de l'implémentation de la version 1.4.
+	
+	Le deuxième bug est l'impossibilité de joindre un ring sur os x.  Bien que la référence vers l'anneau
+	puisse être récupérée correctement à partir du ticket oz, ce qui laisse entendre que la connexion entre 
+	plusieurs processus oz est réalisée correctement, l'exécution de join() renvoie systématiquement
+	l'exception failedToJoin, même en l'absence de connexion réseau et après avoir désactivé le parefeu.
 \end{document}
