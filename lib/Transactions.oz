@@ -1,3 +1,4 @@
+% The transactions used to modify pages
 functor
 import
    Page at 'Page.ozf'

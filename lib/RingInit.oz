@@ -1,3 +1,4 @@
+%Ring initialization
 functor
 import
    P2PS at 'p2ps/trunk/P2PSNode.ozf'

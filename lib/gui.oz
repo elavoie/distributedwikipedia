@@ -1,3 +1,4 @@
+% GUI the user interface and client connections
 functor
 import
 	Pickle
@@ -16,7 +17,7 @@ define
 	RingRef		%reference to the server
 	Node		%the client node
 	
-	UrlHandle	%widget handles
+	UrlHandle	% GUI widget handles
 	PageHandle
 	StatusHandle
 	HostButtonHandle
@@ -28,28 +29,26 @@ define
 	
 	GuiQuit		%binds when the application quits
 	CurrentPage = {NewCell {Page.newpage}}	%the current symbolic page
-	proc {Offer T FN}
-   		{Pickle.save {Connection.offerMany T} FN}
-	end
-	proc {SetPageText}
+	proc {SetPageText}	%update the text on the page to be currentpage.
 		{PageHandle set( {Page.tostring @CurrentPage} )}
 	end
-	fun {GetPageText}
+	fun {GetPageText}	%returns the text on the page as a String
 		{PageHandle get($)}
 	end
-	fun {GetUrl}
+	fun {GetUrl}		%returns the url as an atom
 		{String.toAtom {UrlHandle get($)}}
 	end
-	proc {SetUrl S}
+	proc {SetUrl S}		%sets the url in the bar to be S
 		{UrlHandle set(S)}
 	end
-	proc {SetButtonConnected}
+	proc {SetButtonConnected}	%disable and enable button after a successfull connection
 		{PageHandle set(state:normal)}
 		{HostButtonHandle set(state:disabled)}
 		{GoButtonHandle set(state:normal)}
 		{ConnectButtonHandle set(state:disabled)}
 		{RefreshButtonHandle set(state:normal)}
 	end
+	/* STATUS MODIFCATIONS : change the text and color of the status bar */
 	proc {SetStatusOnline}
 		{StatusHandle set("Online")}
 		{StatusHandle set(bg:c(0 255 128))}
@@ -225,16 +224,9 @@ D=td(	return:GuiQuit
 		)
 )
 in	
-	
-	%{Offer {RingInit.newring dss} DefaultTicketFile} 
-	
-	%{Pickle.save {Connection.offerMany {RingInit.newring dss}} DefaultTicketFile}
-	
-	%RingRef = {RingInit.newring dss}
 	Win = {QTk.build D}
 	{Win show}
 	{SetUrl {Pickle.load DefaultTicketFile}}
-	%{SetStatusOnline}
 	{Wait GuiQuit}
 	{Application.exit 0}
 end
