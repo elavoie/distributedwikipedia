@@ -120,8 +120,38 @@
 	Le design du système s'est articulé autour de deux principaux points: la gestion des transactions et le développement
 	d'un type de données.
 	
+	\subsection{Transactions}
+	Deux transactions ont été identifiées, \textit{Refresh} et \textit{Submit}.  
 	
-	\subsection{Limitations}
+	La première permet de récupérer la page associée à une URL donnée.  Dans le cas, où aucune page 
+	n'est associée à l'URL, alors une nouvelle page est crée.  Ce comportement
+	correspond à celui de wikipedia, qui crée une nouvelle page en mode édition lorsqu'un lien qui pointe vers une page
+	inexistante est suivi.  Cette transaction réussit donc toujours et retourne toujours une page valide.
+	
+	La deuxième permet de mettre à jour la page modifiée.  Pour ce faire, la transaction récupère la page
+	courante et tente de fusionner les changements effectués sur la page.  Si cette fusion réussit alors
+	la transaction réussit sinon elle est annulée.  Voir la section suivante pour le type de donnée page.
+	
+	Les transations sont dans le functor Transactions.oz sous lib/ dans le code source.
+	
+	\subsection{Type de donnée Page}
+	Pour pouvoir effectuer correctement la mise à jour des pages, un type de donnée symbolique page a été réalisé,
+	supportant les ajouts, les retraits et la mise à jour de paragraphes.  Chaque paragraphe est versionné de sorte,
+	qu'il est possible de discriminer l'ordre temporel des changements.  De plus, il y a séparation entre les paragraphes
+	et leur position dans la page ce qui permet de découpler leur position de leur contenu et permettre une fusion intelligente.
+	 La fonction de fusion des pages en version symbolique est robuste et permet de suivre les modifications à 
+	 des paragraphes mêmes si ceux si ont été déplacés ou que des paragraphes ont été ajoutés ou supprimés.  
+	 
+	 Cependant, comme l'utilisateur ne modifie pas directement cette version symbolique, des fonctions permettent de passer
+	d'une version symbolique à une version textuelle (String) et vice versa.  L'algorithme actuelle permet de détecter
+	des modifications sur plusieurs paragraphes en même temps mais ne supporte l'ajout ou la suppression que d'un
+	paragraphe à la fois.  Étant donné le temps limité pour arriver à une solution transparente pour l'utilisateur,
+	il a été choisi de demander à l'utilisateur de sauvegarder en version symbolique manuellement la version qu'il est 
+	en train d'éditer.  Il est possible de procéder à plusieurs sauvegardes avant de fusionner avec la version courante
+	car l'algorithme de fusion est assez robuste.
+	
+	
+	\subsection{Limitations et Améliorations potentielles}
 	Notre application actuelle est sympathique en tant que proof-of-concept,
 	mais souffre d'un certain nombre de limitations.
 	\subsubsection{Connectivité} 
