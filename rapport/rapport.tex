@@ -76,14 +76,50 @@
 			du premier sera déjà dans la barre d'adresse.
 		\item Sur le premier client, modifier la ligne de texte, sauvegarder et soumettre les
 			changements.
-		\item 	
+		\item Sur le deuxième, modifier également le texte, sauvegarder et soumettre le texte. 
+			Le client notifiera que la modification ne peut être effectuée et chargera la dernière
+			page valide sur le serveur.	
 	\end{itemize}
 	
 	\subsection{Gestion de modifications concurrentes indépendantes}
+	Le plus simple cas pour constater l'intégration de modifications concurrentes est de suivre les étapes suivantes:
+	\begin{itemize}
+		\item Démarrer un premier client
+		\item Démarrer l'anneau de noeuds ''server'' sur un des deux clients.
+		\item Démarrer un deuxième client et se connecter au premier.  Par défaut, le ticket
+			du premier sera déjà dans la barre d'adresse.
+		\item Sur le premier client, ajouter un paragraphe en dessous du premier (actuellement un 
+			seul paragraphe peut être ajouté à la fois entre les différentes sauvegarde).
+			Sauvegarder et soumettre les modifications.
+		\item Sur le deuxième, rafraîchir la page modifiée par le premier client.
+		\item Sur le premier client, modifier le premier paragraphe, sauvegarder et soumettre.
+		\item Sur le deuxième, modifier le deuxième paragraphe, sauvegarder et soumettre. Les 
+			changements effectués sur le premier client vont apparaître.
+		\item Rafraîchir la page sur le premier client pour voir apparaître les changements du 
+			deuxième client.	
+	\end{itemize}
 	
 	\section{Architecture}
+	Le système actuel dédie un noeud par client qui se joint à l'anneau.  Étant donné les différents 
+	problèmes de connexion rencontrés, nous nous en sommes tenus à la version simple de l'anneau, 
+	sans utiliser la possibilité de ''relaxer'' l'anneau avec des branches.  Pour assurer la majorité lors des
+	différentes opérations distribuées, nécessaire pour réaliser les ''commit'' avec l'algorithme Paxos,
+	un anneau initial composé de 5 noeuds est initialisé lors que la fonction ''host server'' est utilisée.
+	L'anneau tourne alors dans le même processus Oz que le client.  Tous les clients suivants qui
+	se connectent auront un noeud dans leur processus qui se connectera au processus initial.  Cette topologie
+	a été utlisée pour la simple et unique raison qu'elle minimisait les risques d'erreurs de connexion au moment 
+	où un noeud dans un autre processus se joint à l'anneau, puisque plusieurs erreurs ont été 
+	rencontrées au courant du développement.
+	
+	Pour la version finale, nous nous attendions à utiliser un noeud par processus Oz, donc par client et démarrer
+	un ensemble de noeuds pour simuler un grand nombre de clients déjà connectés entre eux.  L'objectif final
+	serait que même si un client se déconnecte, l'anneau survit et reste intègre.
+	
 	
 	\section{Design}
+	Le design du système s'est articulé autour de deux principaux points: la gestion des transactions et le développement
+	d'un type de données.
+	
 	
 	\subsection{Limitations}
 	 
